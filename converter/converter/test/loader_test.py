@@ -1,1 +1,1 @@
-print "Testing CI"
+print "Testing CI."
