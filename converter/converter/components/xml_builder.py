@@ -7,19 +7,19 @@ class XML_builder:
 
 
     def ram_to_xml(self):
-        if self.schema == None:
+        if self.schema is None:
             raise ValueError("Schema is empty")
         xml = dom.Document()
 
         element = xml.createElement("dbd_schema")
         node = element
-        if self.chema.fulltext_engine != None:
+        if self.chema.fulltext_engine is not None:
             node.setAttribute("fulltext_engine", self.schema.fulltext_engine)
-        if self.schema.version != None:
+        if self.schema.version is not None:
             node.setAttribute("version", self.schema.version)
-        if self.schema.name != None:
+        if self.schema.name is not None:
             node.setAttribute("name", self.schema.name)
-        if self.schema.description != None:
+        if self.schema.description is not None:
             node.setAttribute("description", self.schema.description)
         node.appendChild(xml.createElement("custom"))
 
@@ -42,17 +42,17 @@ class XML_builder:
         if node is None:
             node = xml.createElement("domain")
 
-        if domain.name != None:
+        if domain.name is not None:
             node.setAttribute("name", domain.name)
-        if domain.description != None:
+        if domain.description is not None:
             node.setAttribute("description", domain.description)
-        if domain.type != None:
+        if domain.type is not None:
             node.setAttribute("type", domain.type)
-        if domain.align != None:
+        if domain.align is not None:
             node.setAttribute("align", domain.align)
-        if domain.width != None:
+        if domain.width is not None:
             node.setAttribute("width", domain.width)
-        if domain.precision != None:
+        if domain.precision is not None:
             node.setAttribute("precision", domain.precision)
 
         props = []
@@ -66,14 +66,14 @@ class XML_builder:
             props.append("show_lead_nulls")
         if domain.thousands_separator:
             props.append("thousands_separator")
-        if props != []:
+        if props:
             node.setAttribute("props", ", ".join(props))
 
-        if domain.char_length != None:
+        if domain.char_length is not None:
             node.setAttribute("char_length", domain.char_length)
-        if domain.length != None:
+        if domain.length is not None:
             node.setAttribute("length", domain.length)
-        if domain.scale != None:
+        if domain.scale is not None:
             node.setAttribute("scale", domain.scale)
 
         return node
@@ -82,9 +82,9 @@ class XML_builder:
         if node is None:
             node = xml.createElement("table")
 
-        if table.name != None:
+        if table.name is not None:
             node.setAttribute("name", table.name)
-        if table.description != None:
+        if table.description is not None:
             node.setAttribute("description", table.description)
 
         props = []
@@ -94,12 +94,12 @@ class XML_builder:
             props.append("edit")
         if table.delete:
             props.append("delete")
-        if props != []:
+        if props:
             node.setAttribute("props", ", ".join(props))
 
-        if table.ht_table_flags != None:
+        if table.ht_table_flags is not None:
             node.setAttribute("ht_table_flags", table.ht_table_flags)
-        if table.access_level != None:
+        if table.access_level is not None:
             node.setAttribute("access_level", table.access_level)
 
         createField = functools.partial(self._createFieldNode, xml)
@@ -120,13 +120,13 @@ class XML_builder:
         if node is None:
             node = xml.createElement("field")
 
-        if field.name != None:
+        if field.name is not None:
             node.setAttribute("name", field.name)
-        if field.rname != None:
+        if field.rname is not None:
             node.setAttribute("rname", field.rname)
-        if field.domain != None:
+        if field.domain is not None:
             node.setAttribute("domain", field.domain)
-        if field.description != None:
+        if field.description is not None:
             node.setAttribute("description", field.description)
 
         props = []
@@ -144,7 +144,7 @@ class XML_builder:
             props.append("autocalculated")
         if field.required:
             props.append("required")
-        if props != []:
+        if props:
             node.setAttribute("props", ", ".join(props))
 
         return node
@@ -152,20 +152,20 @@ class XML_builder:
     def _createConstraintNode(self, xml, constraint):
         node = xml.createElement("constraint")
 
-        if constraint.name != None:
+        if constraint.name is not None:
             node.setAttribute("name", constraint.name)
-        if constraint.kind != None:
+        if constraint.kind is not None:
             node.setAttribute("kind", constraint.kind)
-        if constraint.items != None:
+        if constraint.items is not None:
             if len(constraint.items) == 1:
                 node.setAttribute("items", constraint.items[0])
             else:
                 pass
-        if constraint.reference_type != None:
+        if constraint.reference_type is not None:
             node.setAttribute("reference_type", constraint.reference_type)
-        if constraint.reference != None:
+        if constraint.reference is not None:
             node.setAttribute("reference", constraint.reference)
-        if constraint.expression != None:
+        if constraint.expression is not None:
             node.setAttribute("", constraint.expression)
 
         props = []
@@ -175,13 +175,13 @@ class XML_builder:
             props.append("cascading_delete")
         if constraint.full_cascading_delete:
             props.append("full_cascading_delete")
-        if props != []:
+        if props:
             node.setAttribute("props", ", ".join(props))
 
         return node
 
     def _createIndexNode(self, xml, index):
-        if index.fields != []:
+        if index.fields:
             node = xml.createElement("index")
             if len(index.fields) == 1:
                 node.setAttribute("field", index.fields[0])
@@ -190,7 +190,7 @@ class XML_builder:
                 for item in map(createItem, index.fields):
                     node.appendChild(item)
 
-            if index.name != None:
+            if index.name is not None:
                 node.setAttribute("name", index.name)
 
             props = [];
@@ -200,7 +200,7 @@ class XML_builder:
                 props.append("uniqueness")
             if index.is_clustered:
                 props.append("clustered")
-            if props != []:
+            if props:
                 node.setAttribute("props", ", ".join(props))
 
             return node
