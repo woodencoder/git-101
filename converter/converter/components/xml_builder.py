@@ -13,7 +13,7 @@ class XML_builder:
 
         element = xml.createElement("dbd_schema")
         node = element
-        if self.chema.fulltext_engine is not None:
+        if self.schema.fulltext_engine is not None:
             node.setAttribute("fulltext_engine", self.schema.fulltext_engine)
         if self.schema.version is not None:
             node.setAttribute("version", self.schema.version)
@@ -210,7 +210,7 @@ class XML_builder:
     def _createItem(self, xml, item):
         node = xml.createElement("item")
         node.setAttribute("name", item.name)
-        node.setAttribute("position", str(item.position))
+        node.setAttribute("position", str(item.position.encode('utf-8')))
         if item.desc:
             node.setAttribute("desc")
 

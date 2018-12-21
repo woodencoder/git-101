@@ -19,7 +19,7 @@ class XML_Converter:
                 raise ValueError("Incorrect attribute name \"{}\" in tag \"{}\"".format(attributeName, schema.nodeName))
 
             schema.domains = self._getDomains()
-            schema.tables = self._getTables()
+            schema.tables = self._getTables(self.xml)
 
         return schema
 
