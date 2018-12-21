@@ -1,5 +1,6 @@
 import psycopg2 as pg
 
+
 class Postgres_builder:
 
     def __init__(self, schema):
@@ -7,7 +8,7 @@ class Postgres_builder:
 
     def generate_db(self, db_name):
         self.create_db(db_name)
-        conn = pg.connect(database=db_name, user="postgres", password="123", host="localhost", port="5432")
+        conn = pg.connect(database=db_name, user="user", password="password", host="localhost", port="5432")
         cur = conn.cursor()
         conn.set_isolation_level(pg.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
 
@@ -20,7 +21,7 @@ class Postgres_builder:
             cur.execute('CREATE DOMAIN "{}"."{}" AS "{}"'.format(
                 self.schema.name,
                 domain.name,
-                self.schema(domain.type)))
+                get_type(domain.type)))
 
         for table in self.schema.tables:
             request = ('CREATE TABLE "{}"."{}" ('.format(
@@ -85,8 +86,8 @@ class Postgres_builder:
         conn.commit()
         conn.close()
 
-    def create_db(db_name):
-        conn = pg.connect(user="postgres", password="123", host="localhost", port="5432")
+    def create_db(self, db_name):
+        conn = pg.connect(user="user", password="password", host="localhost", port="5432")
         cur = conn.cursor()
         conn.set_isolation_level(pg.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
         cur.execute('DROP DATABASE IF EXISTS ' + db_name)
