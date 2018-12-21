@@ -80,7 +80,7 @@ class Postgres_builder:
                     "UNIQUE" if index.uniqueness else "",
                     index.name if index.name != None else "",
                     self.schema.name,
-                    table.name, index.fields[0]))d
+                    table.name, index.fields[0]))
 
         conn.commit()
         conn.close()
