@@ -1,6 +1,6 @@
 from models import Schema, Domain, Table, Constraint, Field, Index, Item
 import sqlite3
-import uuid1
+import uuid
 import data.dbd_const as script
 
 
@@ -32,23 +32,23 @@ class Loader:
         for domain in db_domains:
             tmp = Domain()
 
-            if domain[1] != None:
+            if domain[1] is not None:
                 tmp.name = str(domain[1])
-            if domain[2] != None:
+            if domain[2] is not None:
                 tmp.description = str(domain[2])
-            if domain[3] != None:
+            if domain[3] is not None:
                 tmp.type = self._getDbDataType(cur, domain[3])
-            if domain[4] != None:
+            if domain[4] is not None:
                 tmp.length = str(domain[4])
-            if domain[5] != None:
+            if domain[5] is not None:
                 tmp.char_length = str(domain[5])
-            if domain[6] != None:
+            if domain[6] is not None:
                 tmp.precision = str(domain[6])
-            if domain[7] != None:
+            if domain[7] is not None:
                 tmp.scale = str(domain[7])
-            if domain[8] != None:
+            if domain[8] is not None:
                 tmp.width = str(domain[8])
-            if domain[9] != None:
+            if domain[9] is not None:
                 tmp.align = str(domain[9])
             # props
             tmp.show_null = domain[10]
@@ -71,18 +71,18 @@ class Loader:
         for table in db_tables:
             tmp = Table()
 
-            if table[2] != None:
+            if table[2] is not None:
                 tmp.name = str(table[2])
-            if table[3] != None:
+            if table[3] is not None:
                 tmp.description = str(table[3])
 
             tmp.add = table[4]
             tmp.edit = table[5]
             tmp.delete = table[6]
 
-            if table[7] != None:
+            if table[7] is not None:
                 tmp.access_level = str(table[7])
-            if table[8] != None:
+            if table[8] is not None:
                 tmp.ht_table_flags = str(table[8])
             tmp.fields = self._getDbFields(cur, table[0])
             tmp.constraints = self._getDbConstraints(cur, table[0])
@@ -102,13 +102,13 @@ class Loader:
         for field in db_fields:
             tmp = Field()
 
-            if field[3] != None:
+            if field[3] is not None:
                 tmp.name = str(field[3])
-            if field[4] != None:
+            if field[4] is not None:
                 tmp.rname = str(field[4])
-            if field[5] != None:
+            if field[5] is not None:
                 tmp.description = str(field[5])
-            if field[6] != None:
+            if field[6] is not None:
                 tmp.domain = self._getDbDomainName(cur, field[6])
             tmp.input = field[7]
             tmp.edit = field[8]
@@ -132,13 +132,13 @@ class Loader:
         for constraint in db_constraints:
             tmp = Constraint()
 
-            if constraint[2] != None:
+            if constraint[2] is not None:
                 tmp.name = str(constraint[2])
-            if constraint[3] != None:
+            if constraint[3] is not None:
                 tmp.kind = str(constraint[3])
-            if constraint[4] != None:
+            if constraint[4] is not None:
                 tmp.reference = self._getDbTableName(cur, constraint[4])
-            if constraint[5] != None:
+            if constraint[5] is not None:
                 tmp.reference_type = str(constraint[5])
             tmp.has_value_edit = constraint[6]
             tmp.cascading_delete = constraint[7]
@@ -174,7 +174,7 @@ class Loader:
             for item in self._getDbIndexDetails(cur, index[0]):
                 tmp.fields.append(item.name)
 
-            if index[2] != None:
+            if index[2] is not None:
                 tmp.name = str(index[2])
             tmp.fulltext = index[3]
             if index[4] != "simple":
