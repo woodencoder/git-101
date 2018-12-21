@@ -4,4 +4,4 @@ python:
   - "2.7"
 
 script:
-  - python test/loader_test.py
+  - python converter/test/loader_test.py
