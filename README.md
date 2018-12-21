@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/woodencoder/git-101.svg?branch=master)](https://travis-ci.org/woodencoder/git-101)
 
 # Git-101
 This repository contains a source code for the Kuban State University's course.
