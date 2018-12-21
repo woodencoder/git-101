@@ -12,9 +12,11 @@ begin transaction;
 --
 -- Каталог схем для таблиц
 --
+drop table if exists dbd$schemas;
 create table dbd$schemas (
     id integer primary key autoincrement not null,
-    name varchar not null -- имя схемы
+    name varchar not null, -- имя схемы
+    description varchar default(null) -- описание схемы
 );
 """
 
@@ -22,6 +24,7 @@ SQL_DBD_DOMAINS_TABLE_INIT = """
 --
 -- Домены
 --
+drop table if exists dbd$domains;
 create table dbd$domains (
     id  integer primary key autoincrement default(null),
     name varchar unique default(null),  -- имя домена
@@ -49,6 +52,7 @@ SQL_DBD_TABLES_TABLE_INIT = """
 --
 -- Каталог таблиц
 --
+drop table if exists dbd$tables;
 create table dbd$tables (
     id integer primary key autoincrement default(null),
     schema_id integer default(null),      -- идетификатор схемы (dbd$schemas)
@@ -70,6 +74,7 @@ SQL_DBD_TABLES_INIT = """
 --
 -- Поля таблиц
 --
+drop table if exists dbd$fields;
 create table dbd$fields (
     id integer primary key autoincrement default(null),
     table_id integer not null,             -- идентификатор таблицы (dbd$tables)
@@ -97,6 +102,7 @@ create index "idx.88KWRBHA7" on dbd$fields(uuid);
 --
 -- Спец. настройки описателя
 --
+drop table if exists dbd$settings;
 create table dbd$settings (
     key varchar primary key not null,
     value varchar,
@@ -106,6 +112,7 @@ create table dbd$settings (
 --
 -- Ограничения
 --
+drop table if exists dbd$constraints;
 create table dbd$constraints (
     id integer primary key autoincrement default (null),
     table_id integer not null,                           -- идентификатор таблицы (dbd$tables)
@@ -129,6 +136,7 @@ create index "idx.6IOUMJINZ" on dbd$constraints(uuid);
 --
 -- Детали ограничений
 --
+drop table if exists dbd$constraint_details;
 create table dbd$constraint_details (
     id integer primary key autoincrement default(null),
     constraint_id integer not null,          -- идентификатор ограничения (dbd$constraints)
@@ -143,6 +151,7 @@ create index "idx.4NG17JVD7" on dbd$constraint_details(field_id);
 --
 -- Индексы
 --
+drop table if exists dbd$indices;
 create table dbd$indices (
     id integer primary key autoincrement default(null),
     table_id integer not null,                          -- идентификатор таблицы (dbd$tables)
@@ -159,6 +168,7 @@ create index "idx.FQH338PQ7" on dbd$indices(uuid);
 --
 -- Детали индексов
 --
+drop table if exists dbd$index_details;
 create table dbd$index_details (
     id integer primary key autoincrement default(null),
     index_id integer not null,                          -- идентификатор индекса (dbd$indices)
@@ -174,6 +184,7 @@ create index "idx.BQA4HXWNF" on dbd$index_details(field_id);
 --
 -- Типы данных
 --
+drop table if exists dbd$data_types;
 create table dbd$data_types (
     id integer primary key autoincrement, -- идентификатор типа
     type_id varchar unique not null       -- имя типа
@@ -214,6 +225,7 @@ insert into dbd$settings(key, value) values ('dbd.version', '%(dbd_version)s');
 """ % {'dbd_version': CURRENT_DBD_VERSION}
 
 SQL_DBD_VIEWS_INIT = """
+drop view if exists dbd$view_fields;
 create view dbd$view_fields as
 select
   dbd$schemas.name "schema",
@@ -250,6 +262,7 @@ order by
   dbd$tables.name,
   dbd$fields.position;
 
+drop view if exists dbd$view_domains;
 create view dbd$view_domains as
 select
   dbd$domains.id,
@@ -271,6 +284,7 @@ from dbd$domains
   inner join dbd$data_types on dbd$domains.data_type_id = dbd$data_types.id
 order by dbd$domains.id;
 
+drop view if exists dbd$view_constraints;
 create view dbd$view_constraints as
 select
   dbd$constraints.id "constraint_id",
@@ -290,6 +304,7 @@ from
 order by
   constraint_id, position;
 
+drop view if exists dbd$view_indices;
 create view dbd$view_indices as
 select
   dbd$indices.id "index_id",
@@ -319,3 +334,4 @@ commit;
 SQL_DBD_Init = SQL_DBD_PRE_INIT + SQL_DBD_DOMAINS_TABLE_INIT + \
     SQL_DBD_TABLES_TABLE_INIT + SQL_DBD_TABLES_INIT + \
     SQL_DBD_VIEWS_INIT + COMMIT
+

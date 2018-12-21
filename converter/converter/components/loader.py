@@ -8,8 +8,8 @@ class Loader:
     def __init__(self, file_path):
         self.file_path = file_path
 
-    def dbd_to_ram(self, db_path):
-        conn = sqlite3.connect(db_path)
+    def dbd_to_ram(self):
+        conn = sqlite3.connect(self.file_path)
         cur = conn.cursor()
 
         schema = Schema()
@@ -33,9 +33,9 @@ class Loader:
             tmp = Domain()
 
             if domain[1] is not None:
-                tmp.name = str(domain[1])
+                tmp.name = str(domain[1].encode('utf-8'))
             if domain[2] is not None:
-                tmp.description = str(domain[2])
+                tmp.description = str(domain[2].encode('utf-8'))
             if domain[3] is not None:
                 tmp.type = self._getDbDataType(cur, domain[3])
             if domain[4] is not None:
@@ -45,11 +45,11 @@ class Loader:
             if domain[6] is not None:
                 tmp.precision = str(domain[6])
             if domain[7] is not None:
-                tmp.scale = str(domain[7])
+                tmp.scale = str(domain[7].encode('utf-8'))
             if domain[8] is not None:
                 tmp.width = str(domain[8])
             if domain[9] is not None:
-                tmp.align = str(domain[9])
+                tmp.align = str(domain[9].encode('utf-8'))
             # props
             tmp.show_null = domain[10]
             tmp.show_lead_nulls = domain[11]
@@ -74,16 +74,16 @@ class Loader:
             if table[2] is not None:
                 tmp.name = str(table[2])
             if table[3] is not None:
-                tmp.description = str(table[3])
+                tmp.description = str(table[3].encode('utf-8'))
 
             tmp.add = table[4]
             tmp.edit = table[5]
             tmp.delete = table[6]
 
             if table[7] is not None:
-                tmp.access_level = str(table[7])
+                tmp.access_level = str(table[7].encode('utf-8'))
             if table[8] is not None:
-                tmp.ht_table_flags = str(table[8])
+                tmp.ht_table_flags = str(table[8].encode('utf-8'))
             tmp.fields = self._getDbFields(cur, table[0])
             tmp.constraints = self._getDbConstraints(cur, table[0])
             tmp.indices = self._getDbIndices(cur, table[0])
@@ -103,11 +103,11 @@ class Loader:
             tmp = Field()
 
             if field[3] is not None:
-                tmp.name = str(field[3])
+                tmp.name = str(field[3].encode('utf-8'))
             if field[4] is not None:
-                tmp.rname = str(field[4])
+                tmp.rname = str(field[4].encode('utf-8'))
             if field[5] is not None:
-                tmp.description = str(field[5])
+                tmp.description = str(field[5].encode('utf-8'))
             if field[6] is not None:
                 tmp.domain = self._getDbDomainName(cur, field[6])
             tmp.input = field[7]
@@ -133,13 +133,13 @@ class Loader:
             tmp = Constraint()
 
             if constraint[2] is not None:
-                tmp.name = str(constraint[2])
+                tmp.name = str(constraint[2].encode('utf-8'))
             if constraint[3] is not None:
-                tmp.kind = str(constraint[3])
+                tmp.kind = str(constraint[3].encode('utf-8'))
             if constraint[4] is not None:
                 tmp.reference = self._getDbTableName(cur, constraint[4])
             if constraint[5] is not None:
-                tmp.reference_type = str(constraint[5])
+                tmp.reference_type = str(constraint[5].encode('utf-8'))
             tmp.has_value_edit = constraint[6]
             tmp.cascading_delete = constraint[7]
             tmp.expression = constraint[8]
@@ -175,7 +175,7 @@ class Loader:
                 tmp.fields.append(item.name)
 
             if index[2] is not None:
-                tmp.name = str(index[2])
+                tmp.name = str(index[2].encode('utf-8'))
             tmp.fulltext = index[3]
             if index[4] != "simple":
                 tmp.uniqueness = index[4]

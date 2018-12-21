@@ -1,5 +1,5 @@
 import sqlite3
-import uuid1
+import uuid
 import data.dbd_const as script
 
 class DBD_Builder:
@@ -19,7 +19,7 @@ class DBD_Builder:
 
             for domain in self.schema.domains:
                 cur.execute("INSERT into dbd$domains(name, data_type_id, uuid) values (?,?,?)",
-                            (domain.name, -1, str(uuid1.uuid1())))
+                            (domain.name, -1, str(uuid.uuid4())))
                 cur.execute("""UPDATE dbd$domains SET
                                  description = :desc,
                                  length = :length,
@@ -57,7 +57,7 @@ class DBD_Builder:
             for table in self.schema.tables:
 
                 cur.execute("INSERT into dbd$tables(name, uuid) values (?,?)",
-                            (table.name, str(uuid1.uuid1())))
+                            (table.name, str(uuid.uuid4())))
 
                 cur.execute("""UPDATE dbd$tables SET
                                         description = :desc,
@@ -90,7 +90,7 @@ class DBD_Builder:
                 for field in table.fields:
                     cur.execute(
                         "INSERT into dbd$fields(name, russian_short_name, table_id, position, domain_id, uuid) values (?,?,?,?,?,?)",
-                        (field.name, field.rname, table_id[0], pos_f, -1, str(uuid1.uuid1())))
+                        (field.name, field.rname, table_id[0], pos_f, -1, str(uuid.uuid4())))
                     pos_f += 1
 
                     cur.execute(""" UPDATE dbd$fields SET
@@ -142,7 +142,7 @@ class DBD_Builder:
                                  i_name,
                                  index.fulltext,
                                  uni,
-                                 str(uuid1.uuid1())))
+                                 str(uuid.uuid4())))
 
                     index_id = cur.execute("""SELECT dbd$indices.id from dbd$indices
                                             WHERE dbd$indices.name = :i_name""",
@@ -174,7 +174,7 @@ class DBD_Builder:
 
                     pos_i += 1
 
-            # Обработка ограничений
+            # Exceptions
 
             for table in self.schema.tables:
                 pos_c = 0
@@ -206,7 +206,7 @@ class DBD_Builder:
                          constraint.has_value_edit,
                          constraint.cascading_delete,
                          constraint.expression,
-                         str(uuid1.uuid1())))
+                         str(uuid.uuid4())))
 
                     con_id = cur.execute("""SELECT con.id from dbd$constraints con
                                             WHERE con.name = :c_name""",

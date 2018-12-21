@@ -1,7 +1,3 @@
-"""
-Попытка исправления недостатка xml.dom.minidom, состоящего в том, что
-xml.dom.mindom.Document.writexml не сохраняет последовательность атрибутов тэга.
-"""
 from collections import OrderedDict
 
 from xml.dom.minidom import \
@@ -24,7 +20,7 @@ class Element(minidomElement):
         writer.write(indent + "<" + self.tagName)
 
         attrs = self._get_attributes()
-        # <SC> Сохраняем оригинальный порядок атрибутов
+        # Store original order
         # a_names = sorted(attrs.keys())
         a_names = attrs.keys()
 
