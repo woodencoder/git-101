@@ -12,13 +12,16 @@ class Loader:
         conn = sqlite3.connect(self.file_path)
         cur = conn.cursor()
 
-        schema = Schema()
         db_schema = cur.execute("SELECT * from dbd$schemas").fetchall()
+        schema_metadata = self._getMetadata(cur, "dbd$schemas")
+
         for item in db_schema:
-            schema.name = item[1]
-            schema.description = item[2]
+            schema_dictionary = dict(zip(schema_metadata, list(item)))
+            schema = Schema(schema_dictionary)
             schema.domains = self._getDbDomains(cur)
-            schema.tables = self._getDbTables(cur, item[0])
+
+            if schema_dictionary.get("id") is not None:
+                schema.tables = self._getDbTables(cur, schema_dictionary["id"])
 
         conn.commit()
         conn.close()
@@ -29,35 +32,13 @@ class Loader:
         domains = []
 
         db_domains = cur.execute("SELECT * from dbd$domains").fetchall()
+        domain_metadata = self._getMetadata(cur, "dbd$domains")
+
         for domain in db_domains:
-            tmp = Domain()
-
-            if domain[1] is not None:
-                tmp.name = str(domain[1].encode('utf-8'))
-            if domain[2] is not None:
-                tmp.description = str(domain[2].encode('utf-8'))
-            if domain[3] is not None:
-                tmp.type = self._getDbDataType(cur, domain[3])
-            if domain[4] is not None:
-                tmp.length = str(domain[4])
-            if domain[5] is not None:
-                tmp.char_length = str(domain[5])
-            if domain[6] is not None:
-                tmp.precision = str(domain[6])
-            if domain[7] is not None:
-                tmp.scale = str(domain[7].encode('utf-8'))
-            if domain[8] is not None:
-                tmp.width = str(domain[8])
-            if domain[9] is not None:
-                tmp.align = str(domain[9].encode('utf-8'))
-            # props
-            tmp.show_null = domain[10]
-            tmp.show_lead_nulls = domain[11]
-            tmp.thousands_separator = domain[12]
-            tmp.summable = domain[13]
-            tmp.case_sensitive = domain[14]
-
+            domain_dictionary = dict(zip(domain_metadata, list(domain)))
+            tmp = Domain(domain_dictionary)
             domains.append(tmp)
+
         return domains
 
     def _getDbTables(self, cur, schema_id):
@@ -67,26 +48,16 @@ class Loader:
                                     WHERE schema_id = :id
                                     GROUP BY id""",
                                 {"id": schema_id}).fetchall()
+        tables_metadata = self._getMetadata(cur, "dbd$tables")
 
         for table in db_tables:
-            tmp = Table()
+            table_dictionary = dict(zip(tables_metadata, list(table)))
+            tmp = Table(table_dictionary)
 
-            if table[2] is not None:
-                tmp.name = str(table[2])
-            if table[3] is not None:
-                tmp.description = str(table[3].encode('utf-8'))
-
-            tmp.add = table[4]
-            tmp.edit = table[5]
-            tmp.delete = table[6]
-
-            if table[7] is not None:
-                tmp.access_level = str(table[7].encode('utf-8'))
-            if table[8] is not None:
-                tmp.ht_table_flags = str(table[8].encode('utf-8'))
-            tmp.fields = self._getDbFields(cur, table[0])
-            tmp.constraints = self._getDbConstraints(cur, table[0])
-            tmp.indices = self._getDbIndices(cur, table[0])
+            if table_dictionary.get("id") is not None:
+                tmp.fields = self._getDbFields(cur, table_dictionary["id"])
+                tmp.constraints = self._getDbConstraints(cur, table_dictionary["id"])
+                tmp.indices = self._getDbIndices(cur, table_dictionary["id"])
 
             tables.append(tmp)
 
@@ -98,25 +69,13 @@ class Loader:
         db_fields = cur.execute(""" SELECT * from dbd$fields
                                     WHERE table_id = :id""",
                                 {"id": table_id}).fetchall()
-
+        field_metadata = self._getMetadata(cur, "dbd$fields")
         for field in db_fields:
-            tmp = Field()
+            field_dictionary = dict(zip(field_metadata, list(field)))
+            tmp = Field(field_dictionary)
 
-            if field[3] is not None:
-                tmp.name = str(field[3].encode('utf-8'))
-            if field[4] is not None:
-                tmp.rname = str(field[4].encode('utf-8'))
-            if field[5] is not None:
-                tmp.description = str(field[5].encode('utf-8'))
-            if field[6] is not None:
-                tmp.domain = self._getDbDomainName(cur, field[6])
-            tmp.input = field[7]
-            tmp.edit = field[8]
-            tmp.show_in_grid = field[9]
-            tmp.show_in_details = field[10]
-            tmp.is_mean = field[11]
-            tmp.autocalculated = field[12]
-            tmp.required = field[13]
+            if field_dictionary["domain_id"] is not None:
+                tmp.domain = self._getDbDomainName(cur, domain_id=field_dictionary["domain_id"])
 
             fields.append(tmp)
 
@@ -128,22 +87,15 @@ class Loader:
         db_constraints = cur.execute(""" SELECT * from dbd$constraints
                                     WHERE table_id = :id""",
                                      {"id": table_id}).fetchall()
-
+        field_metadata = self._getMetadata(cur, "dbd$constraints")
         for constraint in db_constraints:
-            tmp = Constraint()
+            constraints_dictionary = dict(zip(field_metadata, list(constraint)))
+            tmp = Constraint(constraints_dictionary)
 
-            if constraint[2] is not None:
-                tmp.name = str(constraint[2].encode('utf-8'))
-            if constraint[3] is not None:
-                tmp.kind = str(constraint[3].encode('utf-8'))
-            if constraint[4] is not None:
-                tmp.reference = self._getDbTableName(cur, constraint[4])
-            if constraint[5] is not None:
-                tmp.reference_type = str(constraint[5].encode('utf-8'))
-            tmp.has_value_edit = constraint[6]
-            tmp.cascading_delete = constraint[7]
-            tmp.expression = constraint[8]
-            tmp.items = self._getDbConstraintDetails(cur, constraint[0])
+
+
+            if constraints_dictionary["id"] is not None:
+                tmp.items = self._getDbConstraintDetails(cur, constraint[0])
 
             constraints.append(tmp)
 
@@ -219,3 +171,10 @@ class Loader:
         return cur.execute("""SELECT name from dbd$tables
                             WHERE id = :id""",
                            {"id": table_id}).fetchone()[0]
+
+    def _getMetadata(self, cur, table_name):
+        cur.execute('PRAGMA TABLE_INFO({})'.format(table_name))
+
+        # collect names in a list
+        metadata = [tup[1] for tup in cur.fetchall()]
+        return metadata

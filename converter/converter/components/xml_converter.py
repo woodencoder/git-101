@@ -108,13 +108,24 @@ class XML_Converter:
         fields = []
         for field in xml.getElementsByTagName("field"):
             tmp = Field()
+            domain = Domain()
             for attributeName, attributeValue in field.attributes.items():
                 if attributeName.lower() == "name":
                     tmp.name = attributeValue
                 elif attributeName.lower() == "rname":
                     tmp.rname = attributeValue
-                elif attributeName.lower() == "domain":
+                elif attributeName == "domain":
                     tmp.domain = attributeValue
+                elif attributeName.lower() == "domain.name":
+                    domain.name = attributeValue
+                elif attributeName.lower() == "domain.char_length":
+                    domain.char_length = attributeValue
+                elif attributeName.lower() == "domain.precision":
+                    domain.precision = attributeValue
+                elif attributeName.lower() == "domain.scale":
+                    domain.scale = attributeValue
+                elif attributeName.lower() == "domain.type":
+                    domain.type = attributeValue
                 elif attributeName.lower() == "description":
                     tmp.description = attributeValue
                 elif attributeName.lower() == "props":
@@ -138,7 +149,8 @@ class XML_Converter:
                 else:
                     raise ValueError(
                         "Incorrect attribute name \"{}\" in tag \"{}\" ".format(attributeName, field.nodeName))
-
+            if tmp.domain is None:
+                tmp.domain = domain
             fields.append(tmp)
         return fields
 
