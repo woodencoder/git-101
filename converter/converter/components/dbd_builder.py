@@ -84,13 +84,13 @@ class DBD_Builder:
                 table_id = cur.execute("""SELECT id from dbd$tables
                                                             WHERE dbd$tables.name = :t_name""",
                                        {"t_name": table.name}).fetchone()
-
+                domain_ids = self.get_id(cur, """SELECT id,name FROM dbd$domains""")
                 pos_f = 1
 
                 for field in table.fields:
                     cur.execute(
                         "INSERT into dbd$fields(name, russian_short_name, table_id, position, domain_id, uuid) values (?,?,?,?,?,?)",
-                        (field.name, field.rname, table_id[0], pos_f, -1, str(uuid.uuid4())))
+                        (field.name, field.rname, table_id[0], pos_f, domain_ids[domain.name], str(uuid.uuid4())))
                     pos_f += 1
 
                     cur.execute(""" UPDATE dbd$fields SET
@@ -112,13 +112,6 @@ class DBD_Builder:
                                  "autocalc": field.autocalculated,
                                  "req": field.required,
                                  "name": field.name})
-
-                    cur.execute(""" UPDATE dbd$fields
-                                            SET domain_id = (
-                                            SELECT id from dbd$domains WHERE dbd$domains.name = :dom_n) 
-                                            WHERE domain_id = -1""",
-                                {"dom_n": field.domain})
-
                 pos_i = 1
 
                 for index in table.indices:
@@ -237,3 +230,26 @@ class DBD_Builder:
 
             conn.commit()
             conn.close()
+
+    def get_id(self, cursor, query):
+        """
+        Get all ids
+        :param self:
+        :return: map{name:id}
+        """
+        cursor.execute(query)
+        result_map = {}
+        for result_obj in self.get_result(cursor):
+            result_map[result_obj["name"]] = result_obj["id"]
+        return result_map
+
+    def get_result(self, cursor):
+        """
+        Get result executing query
+        :return:
+        """
+        columns = [column[0] for column in cursor.description]
+        results = []
+        for row in cursor.fetchall():
+            results.append(dict(zip(columns, row)))
+        return results
