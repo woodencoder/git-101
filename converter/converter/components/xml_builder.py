@@ -125,7 +125,17 @@ class XML_builder:
         if field.rname is not None:
             node.setAttribute("rname", field.rname)
         if field.domain is not None:
-            node.setAttribute("domain", field.domain)
+            if field.domain is not None:
+                if str(field.domain) is not None:
+                    node.setAttribute("domain", field.domain)
+                else:
+                    if field.domain.name:
+                        node.setAttribute("domain", field.domain.name)
+                    else:
+                        node.setAttribute("domain.char_length", field.domain.char_length)
+                        node.setAttribute("domain.precision", field.domain.precision)
+                        node.setAttribute("domain.scale", field.domain.scale)
+                        node.setAttribute("domain.type", field.domain.type)
         if field.description is not None:
             node.setAttribute("description", field.description)
 
