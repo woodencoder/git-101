@@ -1,3 +1,5 @@
+import postgres_utils
+
 class Domain:
 
     def __init__(self, dictionary = {}):
@@ -5,6 +7,7 @@ class Domain:
         self.name = dictionary.get("name")
         self.description = dictionary.get("description")
         self.type = dictionary.get("type")
+        self.data_type_id = dictionary.get("data_type_id")
         self.align = dictionary.get("align")
         self.width = dictionary.get("width")
         self.precision = dictionary.get("precision")

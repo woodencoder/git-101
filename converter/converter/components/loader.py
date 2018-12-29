@@ -37,6 +37,8 @@ class Loader:
         for domain in db_domains:
             domain_dictionary = dict(zip(domain_metadata, list(domain)))
             tmp = Domain(domain_dictionary)
+            data_type = cur.execute("SELECT * FROM dbd$data_types WHERE id = :type_id", {"type_id": tmp.data_type_id}).fetchall()
+            tmp.type = data_type[0][1]
             domains.append(tmp)
 
         return domains

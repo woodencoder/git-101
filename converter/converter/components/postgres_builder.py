@@ -8,7 +8,7 @@ class Postgres_builder:
 
     def generate_db(self, db_name):
         self.create_db(db_name)
-        conn = pg.connect(database=db_name, user="user", password="password", host="localhost", port="5432")
+        conn = pg.connect(database=db_name, user="vladislav.klimenko", password="Daylighted253352$", host="localhost", port="5432")
         cur = conn.cursor()
         conn.set_isolation_level(pg.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
 
@@ -87,7 +87,7 @@ class Postgres_builder:
         conn.close()
 
     def create_db(self, db_name):
-        conn = pg.connect(user="user", password="password", host="localhost", port="5432")
+        conn = pg.connect(user="vladislav.klimenko", password="Daylighted253352$", host="localhost", port="5432")
         cur = conn.cursor()
         conn.set_isolation_level(pg.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
         cur.execute('DROP DATABASE IF EXISTS ' + db_name)
