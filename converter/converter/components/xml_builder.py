@@ -48,6 +48,8 @@ class XML_builder:
             node.setAttribute("description", domain.description)
         if domain.type is not None:
             node.setAttribute("type", domain.type)
+        if domain.data_type_id is not None:
+            node.setAttribute("type", domain.type)
         if domain.align is not None:
             node.setAttribute("align", domain.align)
         if domain.width is not None:

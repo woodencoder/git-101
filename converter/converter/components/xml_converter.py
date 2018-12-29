@@ -1,4 +1,5 @@
 from models import Schema, Domain, Table, Constraint, Field, Index, Item
+from utils import postgres_utils
 
 class XML_Converter:
     def __init__(self, xml):
@@ -35,6 +36,7 @@ class XML_Converter:
                     tmp.description = attributeValue
                 elif attributeName.lower() == "type":
                     tmp.type = attributeValue
+                    tmp.type_id = postgres_utils.get_type_in_postgres(tmp)
                 elif attributeName.lower() == "align":
                     tmp.align = attributeValue
                 elif attributeName.lower() == "width":
